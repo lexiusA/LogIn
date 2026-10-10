@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Library Management System</title>
+ 
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+ 
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #eaf4f4, #d8eee9);
+            color: #243b3b;
+        }
+
+        #loginPage {
+            width: 380px;
+            margin: 100px auto;
+            padding: 35px;
+            text-align: center;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+        }
+ 
+        #loginPage h1 {
+            color: #176b5b;
+            margin-bottom: 25px;
+        }
+ 
+        #loginPage input {
+            width: 100%;
+            padding: 12px;
+            margin: 8px 0;
+            border: 1px solid #b8d5d0;
+            border-radius: 8px;
+            outline: none;
+        }
+ 
+        #loginPage input:focus,
+        input:focus,
+        select:focus {
+            border-color: #176b5b;
+            box-shadow: 0 0 0 3px rgba(23, 107, 91, 0.12);
+        }
+ 
+        #loginPage button {
+            width: 100%;
+            padding: 12px;
+            margin-top: 12px;
+            cursor: pointer;
+            border: none;
+            border-radius: 8px;
+            background: #176b5b;
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+        }
+ 
+        #loginPage button:hover {
+            background: #125446;
+        }
+
+        #libraryPage {
+            display: none;
+            max-width: 1250px;
+            margin: 0 auto;
+            padding: 30px;
+        }
+ 
+        .header {
+            background: #176b5b;
+            color: white;
+            padding: 25px 30px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+        }
+ 
+        .header h1 {
+            margin: 0;
+            font-size: 32px;
+        }
+ 
+        .header p {
+            margin: 7px 0 0;
+            opacity: 0.9;
+        }
+ 
+        #logout {
+            float: right;
+            margin: 0;
+            padding: 9px 18px;
+            border: 1px solid rgba(255,255,255,0.5);
+            border-radius: 8px;
+            background: transparent;
+            color: white;
+            cursor: pointer;
+        }
+ 
+        #logout:hover {
+            background: white;
+            color: #176b5b;
+        }
+ 
+        .stats-container {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+ 
+        .stat-card {
+            flex: 1;
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+        }
+ 
+        .stat-card h3 {
+            margin: 0;
+            color: #555;
+            font-size: 14px;
+        }
+ 
+        .stat-card p {
+            margin: 10px 0 0;
+            font-size: 24px;
+            font-weight: bold;
+            color: #176b5b;
+        }
+ 
+        .card {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+        }
+ 
+        h2 {
+            color: #176b5b;
+            margin-top: 0;
+        }
+ 
+        label {
+            display: block;
+            margin-top: 15px;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+ 
+        input,
+        select {
+            width: 220px;
+            padding: 9px;
+            border: 1px solid #b8d5d0;
+            border-radius: 7px;
+            outline: none;
+        }
+ 
+        #searchInput {
+            width: 100%;
+            max-width: 400px;
+        }
+ 
+        .controls-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            align-items: center;
+        }
+ 
+        .form-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 18px;
+        }
+ 
+        .form-group {
+            min-width: 220px;
+        }
+ 
+        button {
+            margin-top: 15px;
+            padding: 9px 16px;
+            cursor: pointer;
+            border: none;
+            border-radius: 7px;
+            font-weight: bold;
+        }
+ 
+        #bookButton {
+            background: #176b5b;
+            color: white;
+        }
+ 
+        #bookButton:hover {
+            background: #125446;
+        }
+ 
+        #cancelEditButton {
+            background: #dfe9e7;
+            color: #29433e;
+            display: none;
+            margin-left: 8px;
+        }
+ 
+        #cancelEditButton:hover {
+            background: #cbdcd8;
+        }
+
+        table {
+            margin-top: 20px;
+            border-collapse: collapse;
+            width: 100%;
+            background: white;
+            overflow: hidden;
+            border-radius: 10px;
+        }
+ 
+        th,
+        td {
+            border: 1px solid #d6e3e0;
+            padding: 11px;
+            text-align: left;
+        }
+ 
+        th {
+            background: #176b5b;
+            color: white;
+        }
+ 
+        tr:nth-child(even) {
+            background: #f4f9f8;
+        }
+ 
+        tr:hover {
+            background: #e8f3f0;
+        }
+ 
+        .actionButton {
+            margin: 2px;
+            padding: 6px 10px;
+            color: white;
+            border-radius: 6px;
+        }
+ 
+        .editButton {
+            background: #3578a8;
+        }
+ 
+        .deleteButton {
+            background: #b84a4a;
+        }
+ 
+        .borrowButton {
+            background: #9a741b;
+        }
+ 
+        .returnButton {
+            background: #4c8069;
+        }
+ 
+        .status-available {
+            color: #28734f;
+            font-weight: bold;
+        }
+ 
+        .status-borrowed {
+            color: #a15d19;
+            font-weight: bold;
+        }
+ 
+        @media (max-width: 700px) {
+            #libraryPage {
+                padding: 15px;
+            }
+ 
+            #loginPage {
+                width: calc(100% - 30px);
+                margin: 50px auto;
+            }
+ 
+            input,
+            select {
+                width: 100%;
+            }
+ 
+            .form-group {
+                width: 100%;
+            }
+ 
+            table {
+                display: block;
+                overflow-x: auto;
+                white-space: nowrap;
+            }
+        }
+    </style>
+</head>
+ 
+<body>
+ 
+<div id="loginPage">
+    <h1>Library Login</h1>
+    <input type="text" id="username" placeholder="Username">
+    <br>
+    <input type="password" id="password" placeholder="Password">
+    <br>
+    <button onclick="login()">Login</button>
+</div>
+ 
+<div id="libraryPage">
+
+    <div class="header">
+        <button id="logout" onclick="logout()">Logout</button>
+        <h1>Library Management System</h1>
+        <p>Manage books, borrowing, and returns</p>
+    </div>
+
+    <div class="stats-container">
+        <div class="stat-card">
+            <h3>Total Books</h3>
+            <p id="statTotal">0</p>
+        </div>
+        <div class="stat-card">
+            <h3>Available Books</h3>
+            <p id="statAvailable">0</p>
+        </div>
+        <div class="stat-card">
+            <h3>Borrowed Books</h3>
+            <p id="statBorrowed">0</p>
+        </div>
+    </div>
+ 
+    <div class="card">
+        <h2>Search, Filter & Sort</h2>
+        <div class="controls-row">
+            <input type="text" id="searchInput" placeholder="Search by ID, title, author..." onkeyup="processTableData()">
+            
+            <select id="filterCategory" onchange="processTableData()">
+                <option value="">All Categories</option>
+                <option value="English">English</option>
+                <option value="Filipino">Filipino</option>
+                <option value="History">History</option>
+                <option value="Mathematics">Mathematics</option>
+            </select>
+ 
+            <select id="sortBy" onchange="processTableData()">
+                <option value="id">Sort by ID</option>
+                <option value="title">Sort by Title</option>
+                <option value="author">Sort by Author</option>
+            </select>
+        </div>
+    </div>
+ 
+    <div class="card">
+        <h2 id="formTitle">Add Book</h2>
+        <div class="form-row">
+            <div class="form-group">
+                <label>Book ID:</label>
+                <input type="text" id="bookID" placeholder="Book ID">
+            </div>
+            <div class="form-group">
+                <label>Book Title:</label>
+                <input type="text" id="bookTitle" placeholder="Book Title">
+            </div>
+            <div class="form-group">
+                <label>Author:</label>
+                <input type="text" id="author" placeholder="Author">
+            </div>
+            <div class="form-group">
+                <label>Category:</label>
+                <input type="text" id="category" placeholder="Category">
+            </div>
+            <div class="form-group">
+                <label>Status:</label>
+                <select id="status" onchange="checkStatus()">
+                    <option value="Available">Available</option>
+                    <option value="Borrowed">Borrowed</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Borrow Date:</label>
+                <input type="date" id="borrowDate">
+            </div>
+            <div class="form-group">
+                <label>Return Date:</label>
+                <input type="date" id="returnDate">
+            </div>
+        </div>
+ 
+        <button id="bookButton" onclick="addBook()">Add Book</button>
+        <button id="cancelEditButton" onclick="cancelEdit()">Cancel Edit</button>
+        <div id="output"></div>
+    </div>
+ 
+    <div class="card">
+        <h2>Book Database</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Book ID</th>
+                    <th>Title</th>
+                    <th>Author</th>
+                    <th>Category</th>
+                    <th>Status</th>
+                    <th>Borrow Date</th>
+                    <th>Return Date</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="bookTable"></tbody>
+        </table>
+    </div>
+ 
+</div>
+ 
+
+<script id="jsonData" type="application/json">
+[
+    {
+        "id": "B001",
+        "title": "Journey Through Literature and Language",
+        "author": "DepEd",
+        "category": "English",
+        "status": "Available",
+        "borrowDate": "",
+        "returnDate": ""
+    },
+    {
+        "id": "B002",
+        "title": "Vinta: Paglalayag sa Wikang Filipino",
+        "author": "DepEd",
+        "category": "Filipino",
+        "status": "Borrowed",
+        "borrowDate": "2026-10-01",
+        "returnDate": "2026-10-15"
+    },
+    {
+        "id": "B003",
+        "title": "Araling Panlipunan: Mga Kontemporaryong Isyu",
+        "author": "DepEd",
+        "category": "History",
+        "status": "Available",
+        "borrowDate": "",
+        "returnDate": ""
+    },
+    {
+        "id": "B004",
+        "title": "Patterns and Practicalities",
+        "author": "DepEd",
+        "category": "Mathematics",
+        "status": "Available",
+        "borrowDate": "",
+        "returnDate": ""
+    }
+]
+</script>
+ 
+<script>
+let editIndex = -1;
+ 
+
+function login() {
+    let username = document.getElementById("username").value.trim();
+    let password = document.getElementById("password").value;
+ 
+    if (username === "" || password === "") {
+        alert("Please enter your username and password.");
+        return;
+    }
+ 
+    if (username === "admin" && password === "1234") {
+        alert("Admin login successful!");
+        document.getElementById("loginPage").style.display = "none";
+        document.getElementById("libraryPage").style.display = "block";
+        processTableData();
+    } else {
+        alert("Invalid admin username or password.");
+    }
+}
+ 
+
+function logout() {
+    if (confirm("Are you sure you want to logout?")) {
+        document.getElementById("libraryPage").style.display = "none";
+        document.getElementById("loginPage").style.display = "block";
+        document.getElementById("username").value = "";
+        document.getElementById("password").value = "";
+        document.getElementById("searchInput").value = "";
+        cancelEdit();
+        alert("Admin has been logged out.");
+    }
+}
+
+let defaultBooks = JSON.parse(document.getElementById("jsonData").textContent);
+let savedBooks = localStorage.getItem("libraryBooks");
+let books;
+ 
+if (savedBooks) {
+    books = JSON.parse(savedBooks);
+} else {
+    books = defaultBooks;
+    localStorage.setItem("libraryBooks", JSON.stringify(books));
+}
+ 
+
+function checkStatus() {
+    let status = document.getElementById("status").value;
+    let borrowDate = document.getElementById("borrowDate");
+    let returnDate = document.getElementById("returnDate");
+ 
+    if (status === "Available") {
+        borrowDate.value = "";
+        returnDate.value = "";
+        borrowDate.disabled = true;
+        returnDate.disabled = true;
+    } else {
+        borrowDate.disabled = false;
+        returnDate.disabled = false;
+    }
+}
+ 
+
+function updateStatistics() {
+    let total = books.length;
+    let available = books.filter(b => b.status === "Available").length;
+    let borrowed = books.filter(b => b.status === "Borrowed").length;
+ 
+    document.getElementById("statTotal").textContent = total;
+    document.getElementById("statAvailable").textContent = available;
+    document.getElementById("statBorrowed").textContent = borrowed;
+}
+ 
+
+function processTableData() {
+    let search = document.getElementById("searchInput").value.toLowerCase().trim();
+    let selectedCategory = document.getElementById("filterCategory").value;
+    let sortBy = document.getElementById("sortBy").value;
+ 
+    // 1. Filter by search input and category
+    let result = books.filter(function(book) {
+        let matchesSearch = (
+            book.id.toLowerCase().includes(search) ||
+            book.title.toLowerCase().includes(search) ||
+            book.author.toLowerCase().includes(search) ||
+            book.category.toLowerCase().includes(search) ||
+            book.status.toLowerCase().includes(search)
+        );
+ 
+        let matchesCategory = (selectedCategory === "" || book.category === selectedCategory);
+ 
+        return matchesSearch && matchesCategory;
+    });
+ 
+
+    result.sort(function(a, b) {
+        if (sortBy === "id") {
+            return a.id.localeCompare(b.id);
+        } else if (sortBy === "title") {
+            return a.title.localeCompare(b.title);
+        } else if (sortBy === "author") {
+            return a.author.localeCompare(b.author);
+        }
+    });
+ 
+    displayBooks(result);
+    updateStatistics();
+}
+ 
+
+function displayBooks(bookList) {
+    let table = document.getElementById("bookTable");
+    table.innerHTML = "";
+ 
+    bookList.forEach(function(book) {
+        let actionButtons = "";
+        let originalIndex = books.findIndex(item => item.id === book.id);
+ 
+        actionButtons += `<button class="actionButton editButton" onclick="editBook(${originalIndex})">Edit</button>`;
+        actionButtons += `<button class="actionButton deleteButton" onclick="deleteBook('${book.id}')">Delete</button>`;
+ 
+        if (book.status === "Available") {
+            actionButtons += `<button class="actionButton borrowButton" onclick="borrowBook('${book.id}')">Borrow</button>`;
+        } else {
+            actionButtons += `<button class="actionButton returnButton" onclick="returnBook('${book.id}')">Return</button>`;
+        }
+ 
+        let row = document.createElement("tr");
+        let statusClass = book.status === "Available" ? "status-available" : "status-borrowed";
+ 
+        let values = [
+            book.id,
+            book.title,
+            book.author,
+            book.category,
+            book.status,
+            book.borrowDate || "-",
+            book.returnDate || "-"
+        ];
+ 
+        values.forEach(function(value, index) {
+            let cell = document.createElement("td");
+            cell.textContent = value;
+            if (index === 4) {
+                cell.className = statusClass;
+            }
+            row.appendChild(cell);
+        });
+ 
+        let actionCell = document.createElement("td");
+        actionCell.innerHTML = actionButtons;
+        row.appendChild(actionCell);
+ 
+        table.appendChild(row);
+    });
+}
+ 
+
+function addBook() {
+    let id = document.getElementById("bookID").value.trim();
+    let title = document.getElementById("bookTitle").value.trim();
+    let author = document.getElementById("author").value.trim();
+    let category = document.getElementById("category").value.trim();
+    let status = document.getElementById("status").value;
+    let borrowDate = document.getElementById("borrowDate").value;
+    let returnDate = document.getElementById("returnDate").value;
+ 
+    if (!id || !title || !author || !category) {
+        alert("Please fill in all book information.");
+        return;
+    }
+ 
+    if (editIndex !== -1) {
+        updateBook();
+        return;
+    }
+ 
+    if (books.some(book => book.id === id)) {
+        alert("Book ID already exists.");
+        return;
+    }
+ 
+    if (status === "Borrowed") {
+        if (!borrowDate || !returnDate) {
+            alert("Please enter the borrow date and return date.");
+            return;
+        }
+        if (returnDate < borrowDate) {
+            alert("Return date cannot be earlier than the borrow date.");
+            return;
+        }
+    } else {
+        borrowDate = "";
+        returnDate = "";
+    }
+ 
+    books.push({
+        id: id,
+        title: title,
+        author: author,
+        category: category,
+        status: status,
+        borrowDate: borrowDate,
+        returnDate: returnDate
+    });
+ 
+    saveBooks();
+    processTableData();
+    clearInputs();
+    alert("Book successfully added!");
+}
+ 
+function editBook(index) {
+    if (index < 0 || index >= books.length) {
+        alert("Book not found.");
+        return;
+    }
+ 
+    editIndex = index;
+    let book = books[index];
+ 
+    document.getElementById("bookID").value = book.id;
+    document.getElementById("bookTitle").value = book.title;
+    document.getElementById("author").value = book.author;
+    document.getElementById("category").value = book.category;
+    document.getElementById("status").value = book.status;
+    document.getElementById("borrowDate").value = book.borrowDate || "";
+    document.getElementById("returnDate").value = book.returnDate || "";
+ 
+    document.getElementById("bookID").disabled = true;
+    document.getElementById("bookButton").textContent = "Update Book";
+    document.getElementById("formTitle").textContent = "Edit Book";
+    document.getElementById("cancelEditButton").style.display = "inline-block";
+ 
+    checkStatus();
+ 
+    document.getElementById("output").innerHTML =
+        "<p style='color:#176b5b;font-weight:bold;'>You are editing: " + book.title + "</p>";
+ 
+    window.scrollTo({ top: 0, behavior: "smooth" });
+}
+ 
+/* UPDATE BOOK */
+function updateBook() {
+    if (editIndex === -1) return;
+ 
+    let title = document.getElementById("bookTitle").value.trim();
+    let author = document.getElementById("author").value.trim();
+    let category = document.getElementById("category").value.trim();
+    let status = document.getElementById("status").value;
+    let borrowDate = document.getElementById("borrowDate").value;
+    let returnDate = document.getElementById("returnDate").value;
+ 
+    if (!title || !author || !category) {
+        alert("Please fill in all book information.");
+        return;
+    }
+ 
+    if (status === "Borrowed") {
+        if (!borrowDate || !returnDate) {
+            alert("Please enter the borrow date and return date.");
+            return;
+        }
+        if (returnDate < borrowDate) {
+            alert("Return date cannot be earlier than the borrow date.");
+            return;
+        }
+    } else {
+        borrowDate = "";
+        returnDate = "";
+    }
+ 
+    books[editIndex].title = title;
+    books[editIndex].author = author;
+    books[editIndex].category = category;
+    books[editIndex].status = status;
+    books[editIndex].borrowDate = borrowDate;
+    books[editIndex].returnDate = returnDate;
+ 
+    saveBooks();
+    processTableData();
+    clearInputs();
+    alert("Book successfully updated!");
+}
+ 
+
+function cancelEdit() {
+    editIndex = -1;
+    document.getElementById("bookID").disabled = false;
+    document.getElementById("bookButton").textContent = "Add Book";
+    document.getElementById("formTitle").textContent = "Add Book";
+    document.getElementById("cancelEditButton").style.display = "none";
+    document.getElementById("output").innerHTML = "";
+    clearInputs();
+}
+ 
+
+function deleteBook(bookID) {
+    let book = books.find(item => item.id === bookID);
+    if (!book) {
+        alert("Book not found.");
+        return;
+    }
+ 
+    if (!confirm("Are you sure you want to delete " + book.title + "?")) {
+        return;
+    }
+ 
+    books = books.filter(item => item.id !== bookID);
+    saveBooks();
+    processTableData();
+    alert("Book successfully deleted!");
+}
+ 
+
+function borrowBook(bookID) {
+    let book = books.find(item => item.id === bookID);
+    if (!book || book.status === "Borrowed") {
+        alert("This book is not available.");
+        return;
+    }
+ 
+    let borrowDate = prompt("Enter borrow date (YYYY-MM-DD):");
+    if (!borrowDate) {
+        alert("Borrow date is required.");
+        return;
+    }
+ 
+    let returnDate = prompt("Enter return date (YYYY-MM-DD):");
+    if (!returnDate) {
+        alert("Return date is required.");
+        return;
+    }
+ 
+    if (returnDate < borrowDate) {
+        alert("Return date cannot be earlier than the borrow date.");
+        return;
+    }
+ 
+    book.status = "Borrowed";
+    book.borrowDate = borrowDate;
+    book.returnDate = returnDate;
+ 
+    saveBooks();
+    processTableData();
+    alert("Book successfully borrowed!");
+}
+ 
+
+function returnBook(bookID) {
+    let book = books.find(item => item.id === bookID);
+    if (!book || book.status === "Available") {
+        alert("This book is already available.");
+        return;
+    }
+ 
+    if (!confirm("Are you sure you want to return this book?")) {
+        return;
+    }
+ 
+    book.status = "Available";
+    book.borrowDate = "";
+    book.returnDate = "";
+ 
+    saveBooks();
+    processTableData();
+    alert("Book successfully returned!");
+}
+ 
+
+function saveBooks() {
+    localStorage.setItem("libraryBooks", JSON.stringify(books));
+}
+ 
+
+function clearInputs() {
+    document.getElementById("bookID").value = "";
+    document.getElementById("bookTitle").value = "";
+    document.getElementById("author").value = "";
+    document.getElementById("category").value = "";
+    document.getElementById("borrowDate").value = "";
+    document.getElementById("returnDate").value = "";
+    document.getElementById("status").value = "Available";
+    checkStatus();
+}
+
+checkStatus();
+processTableData();
+</script>
+</body>
+</html>
