@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Library Management System</title>
+ 
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+ 
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #eaf4f4, #d8eee9);
+            color: #243b3b;
+        }
+
+        #loginPage {
+            width: 380px;
+            margin: 100px auto;
+            padding: 35px;
+            text-align: center;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+        }
+ 
+        #loginPage h1 {
+            color: #176b5b;
+            margin-bottom: 25px;
+        }
+ 
+        #loginPage input {
+            width: 100%;
+            padding: 12px;
+            margin: 8px 0;
+            border: 1px solid #b8d5d0;
+            border-radius: 8px;
+            outline: none;
+        }
+ 
+        #loginPage input:focus,
+        input:focus,
+        select:focus {
+            border-color: #176b5b;
+            box-shadow: 0 0 0 3px rgba(23, 107, 91, 0.12);
+        }
+ 
+        #loginPage button {
+            width: 100%;
+            padding: 12px;
+            margin-top: 12px;
+            cursor: pointer;
+            border: none;
+            border-radius: 8px;
+            background: #176b5b;
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+        }
+ 
+        #loginPage button:hover {
+            background: #125446;
+        }
+
+        #libraryPage {
+            display: none;
+            max-width: 1250px;
+            margin: 0 auto;
+            padding: 30px;
+        }
+ 
+        .header {
+            background: #176b5b;
+            color: white;
+            padding: 25px 30px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+        }
+ 
+        .header h1 {
+            margin: 0;
+            font-size: 32px;
+        }
+ 
+        .header p {
+            margin: 7px 0 0;
+            opacity: 0.9;
+        }
+ 
+        #logout {
+            float: right;
+            margin: 0;
+            padding: 9px 18px;
+            border: 1px solid rgba(255,255,255,0.5);
+            border-radius: 8px;
+            background: transparent;
+            color: white;
+            cursor: pointer;
+        }
+ 
+        #logout:hover {
+            background: white;
+            color: #176b5b;
+        }
+ 
+        .stats-container {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+ 
+        .stat-card {
+            flex: 1;
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+        }
+ 
+        .stat-card h3 {
+            margin: 0;
+            color: #555;
+            font-size: 14px;
+        }
+ 
+        .stat-card p {
+            margin: 10px 0 0;
+            font-size: 24px;
+            font-weight: bold;
+            color: #176b5b;
+        }
+ 
+        .card {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+        }
+ 
+        h2 {
+            color: #176b5b;
+            margin-top: 0;
+        }
+ 
+        label {
+            display: block;
+            margin-top: 15px;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+ 
+        input,
+        select {
+            width: 220px;
+            padding: 9px;
+            border: 1px solid #b8d5d0;
+            border-radius: 7px;
+            outline: none;
+        }
+ 
+        #searchInput {
+            width: 100%;
+            max-width: 400px;
+        }
+ 
+        .controls-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            align-items: center;
+        }
+ 
+        .form-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 18px;
+        }
+ 
+        .form-group {
+            min-width: 220px;
+        }
+ 
+        button {
+            margin-top: 15px;
+            padding: 9px 16px;
+            cursor: pointer;
+            border: none;
+            border-radius: 7px;
+            font-weight: bold;
+        }
+ 
+        #bookButton {
+            background: #176b5b;
+            color: white;
+        }
+ 
+        #bookButton:hover {
+            background: #125446;
+        }
+ 
+        #cancelEditButton {
+            background: #dfe9e7;
+            color: #29433e;
+            display: none;
+            margin-left: 8px;
+        }
+ 
+        #cancelEditButton:hover {
+            background: #cbdcd8;
+        }
+
+        table {
+            margin-top: 20px;
+            border-collapse: collapse;
+            width: 100%;
+            background: white;
+            overflow: hidden;
+            border-radius: 10px;
+        }
+ 
+        th,
+        td {
+            border: 1px solid #d6e3e0;
+            padding: 11px;
+            text-align: left;
+        }
+ 
+        th {
+            background: #176b5b;
+            color: white;
+        }
+ 
+        tr:nth-child(even) {
+            background: #f4f9f8;
+        }
+ 
+        tr:hover {
+            background: #e8f3f0;
+        }
+ 
+        .actionButton {
+            margin: 2px;
+            padding: 6px 10px;
+            color: white;
+            border-radius: 6px;
+        }
+ 
+        .editButton {
+            background: #3578a8;
+        }
+ 
+        .deleteButton {
+            background: #b84a4a;
+        }
+ 
+        .borrowButton {
+            background: #9a741b;
+        }
+ 
+        .returnButton {
+            background: #4c8069;
+        }
+ 
+        .status-available {
+            color: #28734f;
+            font-weight: bold;
+        }
+ 
+        .status-borrowed {
+            color: #a15d19;
+            font-weight: bold;
+        }
+ 
+        @media (max-width: 700px) {
+            #libraryPage {
+                padding: 15px;
+            }
+ 
+            #loginPage {
+                width: calc(100% - 30px);
+                margin: 50px auto;
+            }
+ 
+            input,
+            select {
+                width: 100%;
+            }
+ 
+            .form-group {
+                width: 100%;
+            }
+ 
+            table {
+                display: block;
+                overflow-x: auto;
+                white-space: nowrap;
+            }
+        }
+    </style>
+</head>
+ 
+<body>
+ 
+<div id="loginPage">
+    <h1>Library Login</h1>
+    <input type="text" id="username" placeholder="Username">
+    <br>
+    <input type="password" id="password" placeholder="Password">
+    <br>
+    <button onclick="login()">Login</button>
+</div>
+ 
+<div id="libraryPage">
+
+    <div class="header">
+        <button id="logout" onclick="logout()">Logout</button>
+        <h1>Library Management System</h1>
+        <p>Manage books, borrowing, and returns</p>
+    </div>
+</html>
