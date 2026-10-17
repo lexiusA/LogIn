@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Library Management System</title>
+ 
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 30px;
+            min-height: 100vh;
+
+            background: linear-gradient(
+                135deg,
+                #eaf4f4,
+                #d8eee9
+            );
+ 
+            color: #243b3b;
+        }
+ 
+        #loginPage {
+            width: 300px;
+            margin: 100px auto;
+            text-align: center;
+        }
+ 
+        #loginPage input {
+            width: 250px;
+            padding: 10px;
+            margin: 8px 0;
+        }
+ 
+        #loginPage button {
+            padding: 10px 25px;
+            cursor: pointer;
+        }
+ 
+        #libraryPage {
+            display: none;
+        }
+ 
+        h1 {
+            font-size: 32px;
+            color: #176b5b;
+        }
+ 
+        label {
+            display: block;
+            margin-top: 15px;
+            margin-bottom: 5px;
+        }
+ 
+        input, select {
+            padding: 8px;
+        }
+ 
+        button {
+            margin-top: 15px;
+            padding: 8px 15px;
+            cursor: pointer;
+        }
+
+        .stats-container {
+            display: flex;
+            gap: 15px;
+            margin: 20px 0;
+        }
+ 
+        .stat-card {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #b8d5d0;
+            width: 150px;
+            text-align: center;
+        }
+ 
+        .stat-card h4 {
+            margin: 0;
+            color: #555;
+            font-size: 13px;
+        }
+ 
+        .stat-card p {
+            margin: 8px 0 0;
+            font-size: 20px;
+            font-weight: bold;
+            color: #176b5b;
+        }
+ 
+        .controls-row {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+ 
+        table {
+            margin-top: 25px;
+            border-collapse: collapse;
+            width: 1100px;
+            background-color: white;
+        }
+ 
+        th,
+        td {
+            border: 1px solid #b8d5d0;
+            padding: 10px;
+            text-align: left;
+        }
+ 
+        th {
+            background-color: #176b5b;
+            color: white;
+        }
+ 
+        #logout {
+            float: right;
+        }
+ 
+        .actionButton {
+            margin: 2px;
+            padding: 6px 10px;
+        }
+ 
+        #searchInput {
+            width: 300px;
+        }
+    </style>
+</head>
+ 
+<body>
+ 
+<div id="loginPage">
+    <h1>User Login</h1>
+    <input type="text" id="username" placeholder="Username">
+    <br>
+    <input type="password" id="password" placeholder="Password">
+    <br>
+    <button onclick="login()">Login</button>
+</div>
+ 
+<div id="libraryPage">
+    <button id="logout" onclick="logout()">Logout</button>
+    <h1>Library Management System</h1>
+
+    <div class="stats-container">
+        <div class="stat-card">
+            <h4>Total Books</h4>
+            <p id="statTotal">0</p>
+        </div>
+        <div class="stat-card">
+            <h4>Available</h4>
+            <p id="statAvailable">0</p>
+        </div>
+        <div class="stat-card">
+            <h4>Borrowed</h4>
+            <p id="statBorrowed">0</p>
+        </div>
+    </div>
+
+    <div class="controls-row">
+        <div>
+            <label>Search Book:</label>
+            <input type="text" id="searchInput" placeholder="Search by ID, title, author..." onkeyup="processTableData()">
+        </div>
+ 
+        <div>
+            <label>Filter Category:</label>
+            <select id="filterCategory" onchange="processTableData()">
+                <option value="">All Categories</option>
+                <option value="Programming">Programming</option>
+                <option value="Database">Database</option>
+                <option value="Web Development">Web Development</option>
+                <option value="Networking">Networking</option>
+            </select>
+        </div>
+ 
+        <div>
+            <label>Sort By:</label>
+            <select id="sortBy" onchange="processTableData()">
+                <option value="id">Book ID</option>
+                <option value="title">Title</option>
+                <option value="author">Author</option>
+            </select>
+        </div>
+    </div>
+ 
+    <h2>Book Database</h2>
+ 
+    <table>
+        <thead>
+            <tr>
+                <th>Book ID</th>
+                <th>Title</th>
+                <th>Author</th>
+                <th>Category</th>
+                <th>Status</th>
+                <th>Borrow Date</th>
+                <th>Return Date</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody id="bookTable"></tbody>
+    </table>
+</div>
+ 
+<script id="jsonData" type="application/json">
+[
+    {
+        "id": "B001",
+        "title": "Journey Through Literature and Language",
+        "author": "DepEd",
+        "category": "English",
+        "status": "Available",
+        "borrowDate": "",
+        "returnDate": ""
+    },
+    {
+        "id": "B002",
+        "title": "Vinta: Paglalayag sa Wikang Filipino",
+        "author": "DepEd",
+        "category": "Filipino",
+        "status": "Borrowed",
+        "borrowDate": "2026-10-01",
+        "returnDate": "2026-10-15"
+    },
+    {
+        "id": "B003",
+        "title": "Araling Panlipunan: Mga Kontemporaryong Isyu",
+        "author": "DepEd",
+        "category": "History",
+        "status": "Available",
+        "borrowDate": "",
+        "returnDate": ""
+    },
+    {
+        "id": "B004",
+        "title": "Patterns and Practicalities",
+        "author": "DepEd",
+        "category": "Math",
+        "status": "Available",
+        "borrowDate": "",
+        "returnDate": ""
+    }
+]
+</script>
+ 
+<script>
+function login() {
+    let username = document.getElementById("username").value.trim();
+    let password = document.getElementById("password").value;
+ 
+    if (username === "" || password === "") {
+        alert("Please enter your username and password.");
+        return;
+    }
+ 
+    if (username === "user" && password === "1234") {
+        alert("User login successful!");
+        document.getElementById("loginPage").style.display = "none";
+        document.getElementById("libraryPage").style.display = "block";
+        processTableData();
+    } else {
+        alert("Invalid username or password.");
+    }
+}
+ 
+function logout() {
+    if (confirm("Are you sure you want to logout?")) {
+        document.getElementById("libraryPage").style.display = "none";
+        document.getElementById("loginPage").style.display = "block";
+        document.getElementById("username").value = "";
+        document.getElementById("password").value = "";
+        document.getElementById("searchInput").value = "";
+        alert("You have been logged out.");
+    }
+}
+ 
+let defaultBooks = JSON.parse(document.getElementById("jsonData").textContent);
+let savedBooks = localStorage.getItem("libraryBooks");
+let books;
+ 
+if (savedBooks) {
+    books = JSON.parse(savedBooks);
+} else {
+    books = defaultBooks;
+    localStorage.setItem("libraryBooks", JSON.stringify(books));
+}
+
+function updateStatistics() {
+    let total = books.length;
+    let available = books.filter(b => b.status === "Available").length;
+    let borrowed = books.filter(b => b.status === "Borrowed").length;
+ 
+    document.getElementById("statTotal").textContent = total;
+    document.getElementById("statAvailable").textContent = available;
+    document.getElementById("statBorrowed").textContent = borrowed;
+}
+
+function processTableData() {
+    let search = document.getElementById("searchInput").value.toLowerCase().trim();
+    let selectedCategory = document.getElementById("filterCategory").value;
+    let sortBy = document.getElementById("sortBy").value;
+
+    let result = books.filter(function(book) {
+        let matchesSearch = (
+            book.id.toLowerCase().includes(search) ||
+            book.title.toLowerCase().includes(search) ||
+            book.author.toLowerCase().includes(search) ||
+            book.category.toLowerCase().includes(search) ||
+            book.status.toLowerCase().includes(search)
+        );
+ 
+        let matchesCategory = (selectedCategory === "" || book.category === selectedCategory);
+ 
+        return matchesSearch && matchesCategory;
+    });
+
+    result.sort(function(a, b) {
+        if (sortBy === "id") {
+            return a.id.localeCompare(b.id);
+        } else if (sortBy === "title") {
+            return a.title.localeCompare(b.title);
+        } else if (sortBy === "author") {
+            return a.author.localeCompare(b.author);
+        }
+    });
+ 
+    displayBooks(result);
+    updateStatistics();
+}
+ 
+function displayBooks(bookList) {
+    let table = document.getElementById("bookTable");
+    table.innerHTML = "";
+ 
+    bookList.forEach(function(book) {
+        let action = "";
+ 
+        if (book.status === "Available") {
+            action = `<button class="actionButton" onclick="borrowBook('${book.id}')">Borrow</button>`;
+        } else {
+            action = `<button class="actionButton" onclick="returnBook('${book.id}')">Return</button>`;
+        }
+ 
+        let row = document.createElement("tr");
+ 
+        let values = [
+            book.id,
+            book.title,
+            book.author,
+            book.category,
+            book.status,
+            book.borrowDate || "-",
+            book.returnDate || "-"
+        ];
+ 
+        values.forEach(function(value) {
+            let cell = document.createElement("td");
+            cell.textContent = value;
+            row.appendChild(cell);
+        });
+ 
+        let actionCell = document.createElement("td");
+        actionCell.innerHTML = action;
+        row.appendChild(actionCell);
+ 
+        table.appendChild(row);
+    });
+}
+ 
+function borrowBook(bookID) {
+    let book = books.find(item => item.id === bookID);
+ 
+    if (!book) {
+        alert("Book not found.");
+        return;
+    }
+ 
+    if (book.status === "Borrowed") {
+        alert("This book is already borrowed.");
+        return;
+    }
+ 
+    let borrowDate = prompt("Enter borrow date (YYYY-MM-DD):");
+    if (!borrowDate) {
+        alert("Borrow date is required.");
+        return;
+    }
+ 
+    let returnDate = prompt("Enter return date (YYYY-MM-DD):");
+    if (!returnDate) {
+        alert("Return date is required.");
+        return;
+    }
+ 
+    if (returnDate < borrowDate) {
+        alert("Return date cannot be earlier than the borrow date.");
+        return;
+    }
+ 
+    book.status = "Borrowed";
+    book.borrowDate = borrowDate;
+    book.returnDate = returnDate;
+ 
+    saveBooks();
+    processTableData();
+    alert("Book successfully borrowed!");
+}
+ 
+function returnBook(bookID) {
+    let book = books.find(item => item.id === bookID);
+ 
+    if (!book) {
+        alert("Book not found.");
+        return;
+    }
+ 
+    if (book.status === "Available") {
+        alert("This book is already available.");
+        return;
+    }
+ 
+    if (!confirm("Are you sure you want to return this book?")) {
+        return;
+    }
+ 
+    book.status = "Available";
+    book.borrowDate = "";
+    book.returnDate = "";
+ 
+    saveBooks();
+    processTableData();
+    alert("Book successfully returned!");
+}
+ 
+function saveBooks() {
+    localStorage.setItem("libraryBooks", JSON.stringify(books));
+}
+ 
+
+processTableData();
+</script>
+</body>
+</html>
