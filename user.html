@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Library Management System</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            margin: 30px;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #eaf4f4, #d8eee9);
+            color: #243b3b;
+        }
+
+        #loginPage {
+            width: 300px;
+            margin: 100px auto;
+            text-align: center;
+        }
+
+        #loginPage input {
+            width: 250px;
+            padding: 10px;
+            margin: 8px 0;
+        }
+
+        #loginPage button {
+            padding: 10px 25px;
+            cursor: pointer;
+        }
+
+        #libraryPage {
+            display: none;
+        }
+
+        h1 {
+            font-size: 32px;
+            color: #176b5b;
+        }
+
+        label {
+            display: block;
+            margin-top: 15px;
+            margin-bottom: 5px;
+        }
+
+        input, select {
+            padding: 8px;
+        }
+
+        button {
+            margin-top: 15px;
+            padding: 8px 15px;
+            cursor: pointer;
+        }
+
+        .stats-container {
+            display: flex;
+            gap: 15px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #b8d5d0;
+            width: 150px;
+            text-align: center;
+        }
+
+        .stat-card h4 {
+            margin: 0;
+            color: #555;
+            font-size: 13px;
+        }
+
+        .stat-card p {
+            margin: 8px 0 0;
+            font-size: 20px;
+            font-weight: bold;
+            color: #176b5b;
+        }
+
+        .controls-row {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .table-container {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        table {
+            margin-top: 25px;
+            border-collapse: collapse;
+            width: 100%;
+            min-width: 1000px;
+            background-color: white;
+        }
+
+        th, td {
+            border: 1px solid #b8d5d0;
+            padding: 10px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #176b5b;
+            color: white;
+        }
+
+        #logout {
+            float: right;
+        }
+
+        .actionButton {
+            margin: 2px;
+            padding: 6px 10px;
+        }
+
+        #searchInput {
+            width: 300px;
+        }
+
+        .due-soon {
+            color: #b36b00;
+            font-weight: bold;
+        }
+
+        .overdue {
+            color: #c62828;
+            font-weight: bold;
+        }
+
+        .available {
+            color: #176b5b;
+            font-weight: bold;
+        }
+
+        @media (max-width: 600px) {
+            body {
+                margin: 15px;
+            }
+
+            #searchInput {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div id="loginPage">
+    <h1>User Login</h1>
+    <input type="text" id="username" placeholder="Username">
+    <br>
+    <input type="password" id="password" placeholder="Password">
+    <br>
+    <button onclick="login()">Login</button>
+</div>
+
+<div id="libraryPage">
+    <button id="logout" onclick="logout()">Logout</button>
+
+    <h1>Library Management System</h1>
+
+    <div class="stats-container">
+        <div class="stat-card">
+            <h4>Total Books</h4>
+            <p id="statTotal">0</p>
+        </div>
+
+        <div class="stat-card">
+            <h4>Available</h4>
+            <p id="statAvailable">0</p>
+        </div>
+
+        <div class="stat-card">
+            <h4>Borrowed</h4>
+            <p id="statBorrowed">0</p>
+        </div>
+    </div>
+
+    <div class="controls-row">
+        <div>
+            <label for="searchInput">Search Book:</label>
+            <input
+                type="text"
+                id="searchInput"
+                placeholder="Search by ID, title, author..."
+                oninput="processTableData()"
+            >
+        </div>
+
+        <div>
+            <label for="filterCategory">Filter Category:</label>
+            <select id="filterCategory" onchange="processTableData()">
+                <option value="">All Categories</option>
+                <option value="English">English</option>
+                <option value="Filipino">Filipino</option>
+                <option value="History">History</option>
+                <option value="Math">Math</option>
+            </select>
+        </div>
+
+        <div>
+            <label for="sortBy">Sort By:</label>
+            <select id="sortBy" onchange="processTableData()">
+                <option value="id">Book ID</option>
+                <option value="title">Title</option>
+                <option value="author">Author</option>
+            </select>
+        </div>
+    </div>
+
+    <h2>Book Database</h2>
+
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Book ID</th>
+                    <th>Title</th>
+                    <th>Author</th>
+                    <th>Category</th>
+                    <th>Status</th>
+                    <th>Borrow Date</th>
+                    <th>Return Date</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="bookTable"></tbody>
+        </table>
+    </div>
+</div>
+
+<script id="jsonData" type="application/json">
+[
+    {
+        "id": "B001",
+        "title": "Journey Through Literature and Language",
+        "author": "DepEd",
+        "category": "English",
+        "status": "Available",
+        "borrowDate": "",
+        "returnDate": ""
+    },
+    {
+        "id": "B002",
+        "title": "Vinta: Paglalayag sa Wikang Filipino",
+        "author": "DepEd",
+        "category": "Filipino",
+        "status": "Borrowed",
+        "borrowDate": "2026-10-01",
+        "returnDate": "2026-10-08"
+    },
+    {
+        "id": "B003",
+        "title": "Araling Panlipunan: Mga Kontemporaryong Isyu",
+        "author": "DepEd",
+        "category": "History",
+        "status": "Available",
+        "borrowDate": "",
+        "returnDate": ""
+    },
+    {
+        "id": "B004",
+        "title": "Patterns and Practicalities",
+        "author": "DepEd",
+        "category": "Math",
+        "status": "Available",
+        "borrowDate": "",
+        "returnDate": ""
+    }
+]
+</script>
+
+<script>
+
+    function login() {
+        const username = document.getElementById("username").value.trim();
+        const password = document.getElementById("password").value;
+
+        if (username === "" || password === "") {
+            alert("Please enter your username and password.");
+            return;
+        }
+
+        if (username === "user" && password === "1234") {
+            document.getElementById("loginPage").style.display = "none";
+            document.getElementById("libraryPage").style.display = "block";
+
+            alert("User login successful!");
+
+            processTableData();
+            checkDueDates();
+        } else {
+            alert("Invalid username or password.");
+        }
+    }
+
+    function logout() {
+        if (confirm("Are you sure you want to logout?")) {
+            document.getElementById("libraryPage").style.display = "none";
+            document.getElementById("loginPage").style.display = "block";
+
+            document.getElementById("username").value = "";
+            document.getElementById("password").value = "";
+            document.getElementById("searchInput").value = "";
+
+            alert("You have been logged out.");
+        }
+    }
+
+    const defaultBooks = JSON.parse(
+        document.getElementById("jsonData").textContent
+    );
+
+    let savedBooks = localStorage.getItem("libraryBooks");
+    let books;
+
+    if (savedBooks) {
+        try {
+            books = JSON.parse(savedBooks);
+
+            if (!Array.isArray(books)) {
+                books = defaultBooks;
+            }
+        } catch (error) {
+            books = defaultBooks;
+        }
+    } else {
+        books = defaultBooks;
+    }
+
+    function getTodayDate() {
+        const today = new Date();
+
+        const year = today.getFullYear();
+        const month = String(today.getMonth() + 1).padStart(2, "0");
+        const day = String(today.getDate()).padStart(2, "0");
+
+        return `${year}-${month}-${day}`;
+    }
+    function calculateReturnDate(borrowDate) {
+        const date = new Date(borrowDate + "T12:00:00");
+
+        date.setDate(date.getDate() + 7);
+
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, "0");
+        const day = String(date.getDate()).padStart(2, "0");
+
+        return `${year}-${month}-${day}`;
+    }
+    function formatDate(dateString) {
+        if (!dateString) {
+            return "-";
+        }
+
+        const parts = dateString.split("-");
+
+        if (parts.length !== 3) {
+            return dateString;
+        }
+
+        return `${parts[1]}/${parts[2]}/${parts[0]}`;
+    }
+
+    function checkDueDates() {
+        const today = getTodayDate();
+        const dueBooks = [];
+
+        books.forEach(function(book) {
+            if (book.status !== "Borrowed" || !book.returnDate) {
+                return;
+            }
+
+            // Check only books that are due today or overdue.
+            if (book.returnDate <= today) {
+                const reminderKey =
+                    "dueReminder_" + book.id + "_" + book.returnDate;
+n.
+                if (!sessionStorage.getItem(reminderKey)) {
+                    if (book.returnDate < today) {
+                        dueBooks.push(
+                            `"${book.title}" is OVERDUE! Return date was ${formatDate(book.returnDate)}.`
+                        );
+                    } else {
+                        dueBooks.push(
+                            `"${book.title}" is due TODAY (${formatDate(book.returnDate)}). Please return it.`
+                        );
+                    }
+
+                    sessionStorage.setItem(reminderKey, "shown");
+                }
+            }
+        });
+
+        if (dueBooks.length > 0) {
+            alert(
+                "BOOK RETURN REMINDER\n\n" +
+                dueBooks.join("\n\n")
+            );
+        }
+    }
+
+    function updateStatistics() {
+        const total = books.length;
+
+        const available = books.filter(
+            book => book.status === "Available"
+        ).length;
+
+        const borrowed = books.filter(
+            book => book.status === "Borrowed"
+        ).length;
+
+        document.getElementById("statTotal").textContent = total;
+        document.getElementById("statAvailable").textContent = available;
+        document.getElementById("statBorrowed").textContent = borrowed;
+    }
+
+    function processTableData() {
+        const search = document.getElementById("searchInput")
+            .value.toLowerCase().trim();
+
+        const selectedCategory =
+            document.getElementById("filterCategory").value;
+
+        const sortBy = document.getElementById("sortBy").value;
+
+        const result = books.filter(function(book) {
+            const matchesSearch = (
+                book.id.toLowerCase().includes(search) ||
+                book.title.toLowerCase().includes(search) ||
+                book.author.toLowerCase().includes(search) ||
+                book.category.toLowerCase().includes(search) ||
+                book.status.toLowerCase().includes(search)
+            );
+
+            const matchesCategory = (
+                selectedCategory === "" ||
+                book.category === selectedCategory
+            );
+
+            return matchesSearch && matchesCategory;
+        });
+
+        result.sort(function(a, b) {
+            return a[sortBy].localeCompare(b[sortBy]);
+        });
+
+        displayBooks(result);
+        updateStatistics();
+    }
+
+    function displayBooks(bookList) {
+        const table = document.getElementById("bookTable");
+
+        table.innerHTML = "";
+
+        bookList.forEach(function(book) {
+            const row = document.createElement("tr");
+
+            const values = [
+                book.id,
+                book.title,
+                book.author,
+                book.category,
+                book.status,
+                formatDate(book.borrowDate),
+                formatDate(book.returnDate)
+            ];
+
+            values.forEach(function(value, index) {
+                const cell = document.createElement("td");
+                cell.textContent = value;
+
+                if (index === 4) {
+                    cell.className = book.status === "Available"
+                        ? "available"
+                        : "overdue";
+                }
+
+                if (index === 6 && book.status === "Borrowed") {
+                    const today = getTodayDate();
+
+                    if (book.returnDate < today) {
+                        cell.className = "overdue";
+                        cell.textContent += " (OVERDUE)";
+                    } else if (book.returnDate === today) {
+                        cell.className = "due-soon";
+                        cell.textContent += " (DUE TODAY)";
+                    }
+                }
+
+                row.appendChild(cell);
+            });
+
+            const actionCell = document.createElement("td");
+            const actionButton = document.createElement("button");
+
+            actionButton.className = "actionButton";
+
+            if (book.status === "Available") {
+                actionButton.textContent = "Borrow";
+                actionButton.onclick = function() {
+                    borrowBook(book.id);
+                };
+            } else {
+                actionButton.textContent = "Return";
+                actionButton.onclick = function() {
+                    returnBook(book.id);
+                };
+            }
+
+            actionCell.appendChild(actionButton);
+            row.appendChild(actionCell);
+
+            table.appendChild(row);
+        });
+    }
+
+    function borrowBook(bookID) {
+        const book = books.find(item => item.id === bookID);
+
+        if (!book) {
+            alert("Book not found.");
+            return;
+        }
+
+        if (book.status === "Borrowed") {
+            alert("This book is already borrowed.");
+            return;
+        }
+        const borrowDate = getTodayDate();
+
+        const returnDate = calculateReturnDate(borrowDate);
+
+        book.status = "Borrowed";
+        book.borrowDate = borrowDate;
+        book.returnDate = returnDate;
+
+        saveBooks();
+        processTableData();
+
+        alert(
+            "You successfully borrow the book!\n\n" +
+            "Book: " + book.title + "\n" +
+            "Date Borrowed: " + formatDate(borrowDate) + "\n" +
+            "Date to Return: " + formatDate(returnDate) + "\n\n" +
+            "Please return the book within 7 days."
+        );
+    }
+
+    function returnBook(bookID) {
+        const book = books.find(item => item.id === bookID);
+
+        if (!book) {
+            alert("Book not found.");
+            return;
+        }
+
+        if (book.status === "Available") {
+            alert("This book is already available.");
+            return;
+        }
+
+        const today = getTodayDate();
+
+        if (!confirm(
+            "Are you sure you want to return this book?\n\n" +
+            "Book: " + book.title + "\n" +
+            "Borrow Date: " + formatDate(book.borrowDate) + "\n" +
+            "Return Due Date: " + formatDate(book.returnDate) + "\n" +
+            "Actual Return Date: " + formatDate(today)
+        )) {
+            return;
+        }
+
+        book.status = "Available";
+        book.borrowDate = "";
+        book.returnDate = "";
+
+        saveBooks();
+        processTableData();
+
+        alert(
+            "You successfully returned the book!\n\n" +
+            "Book: " + book.title + "\n" +
+            "Date Returned: " + formatDate(today) + "\n\n" +
+            "The book is now available for borrowing."
+        );
+    }
+    function saveBooks() {
+        localStorage.setItem("libraryBooks", JSON.stringify(books));
+    }
+    processTableData();
+</script>
+</body>
+</html>
